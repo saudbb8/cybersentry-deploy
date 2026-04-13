@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cybersentry-saud"
-version = "0.2.0"
+version = "0.2.1"
 description = "Developer-first Security Simulator + Defense Engine — 32 OWASP rules, 6 defence layers, 100% detection"
 readme = "README.md"
 license = {text = "MIT"}
