@@ -2,13 +2,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy requirements first
 COPY api/requirements.txt ./requirements.txt
-
-# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy all api files
 COPY api/main.py ./main.py
 COPY api/database.py ./database.py
 COPY api/auth_utils.py ./auth_utils.py
