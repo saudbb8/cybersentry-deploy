@@ -23,7 +23,7 @@ const COUNTRIES = [
 
 const RULE_TYPES = [
   {value:'ip',          label:'IP Address',    desc:'Block a specific IP address',              placeholder:'e.g. 192.168.1.1'},
-  {value:'cidr',        label:'IP Range (CIDR)',label:'Block a range of IPs',                   placeholder:'e.g. 192.168.1.0/24'},
+  {value:'cidr',        label:'IP Range (CIDR)',desc:'Block a range of IPs',                   placeholder:'e.g. 192.168.1.0/24'},
   {value:'country',     label:'Country',        desc:'Block all traffic from a country',         placeholder:'e.g. CN'},
   {value:'pattern',     label:'URL Pattern',    desc:'Block requests matching a URL pattern',    placeholder:'e.g. /admin/*'},
   {value:'user_agent',  label:'User Agent',     desc:'Block specific bots or browsers',          placeholder:'e.g. sqlmap'},
