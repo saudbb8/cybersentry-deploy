@@ -1,0 +1,22 @@
+# Secrets
+api/.env
+*.env
+
+# Database
+*.db
+*.sqlite
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Mac
+.DS_Store
+
+# venv
+.venv/
