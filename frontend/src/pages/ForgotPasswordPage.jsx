@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Shield, Mail, Phone, Loader, AlertCircle, CheckCircle, ArrowLeft, RefreshCw, Lock, Eye, EyeOff } from 'lucide-react'
 import axios from 'axios'
 
-const API = 'http://localhost:8001'
+import { API } from '../config.js'
 
 function Layout({ title, subtitle, children, back }) {
   return (

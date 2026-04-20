@@ -3,7 +3,7 @@ import { FileText, Download, TrendingUp, Loader, Trash2, RefreshCw } from 'lucid
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import axios from 'axios'
 
-const API = 'http://localhost:8001'
+import { API } from '../config.js'
 
 function generateHTML(report) {
   const scoreColor = report.score >= 80 ? '#22c55e' : report.score >= 60 ? '#f59e0b' : '#ef4444'

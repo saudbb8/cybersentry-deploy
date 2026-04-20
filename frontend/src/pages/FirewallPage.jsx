@@ -6,7 +6,7 @@ import {
 } from 'lucide-react'
 import axios from 'axios'
 
-const API = 'http://localhost:8001'
+import { API } from '../config.js'
 
 const COUNTRIES = [
   {code:'CN',name:'China',flag:'🇨🇳'},{code:'RU',name:'Russia',flag:'🇷🇺'},

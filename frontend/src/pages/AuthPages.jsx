@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Shield, Loader, Eye, EyeOff, AlertCircle, CheckCircle, Mail, ArrowLeft, Lock, RefreshCw } from 'lucide-react'
 import axios from 'axios'
 
-const API = 'http://localhost:8001'
+import { API } from '../config.js'
 const BLOCKED = ['mailinator.com','guerrillamail.com','tempmail.com','yopmail.com','trashmail.com','10minutemail.com']
 
 function validateEmail(email) {
