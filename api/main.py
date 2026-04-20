@@ -60,3 +60,43 @@ def get_settings_public():
 @app.post("/api/settings")
 async def save_settings_public():
     return {"ok": True, "message": "Settings saved"}
+
+import os
+from fastapi import Request
+
+@app.post("/admin/verify-user")
+async def admin_verify(request: Request):
+    data = await request.json()
+    if data.get("secret") != os.environ.get("ADMIN_SECRET", "cybersentry-admin-2026"):
+        raise HTTPException(403, "Forbidden")
+    email = data.get("email", "")
+    from database import SessionLocal, User
+    db = SessionLocal()
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        db.close()
+        return {"message": "User not found", "users": [u.email for u in db.query(User).all()]}
+    user.is_verified = True
+    db.commit()
+    db.close()
+    return {"message": f"Verified: {email}"}
+
+@app.post("/admin/verify-user")
+async def admin_verify_user(request: Request):
+    import os
+    data = await request.json()
+    if data.get("secret") != os.environ.get("ADMIN_SECRET", "cybersentry-admin-2026"):
+        raise HTTPException(status_code=403, detail="Forbidden")
+    email = data.get("email", "")
+    from database import SessionLocal, User
+    db = SessionLocal()
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        all_users = [u.email for u in db.query(User).all()]
+        db.close()
+        return {"message": "User not found", "all_users": all_users}
+    user.is_verified = True
+    db.commit()
+    name = user.name
+    db.close()
+    return {"message": f"✅ {email} verified!", "name": name}
