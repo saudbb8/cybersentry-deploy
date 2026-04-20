@@ -141,7 +141,7 @@ export default function ScanPage() {
     const token = localStorage.getItem('cs_token')
     if (token) {
       try {
-        await axios.post('${import.meta.env.VITE_API_URL || 'http://localhost:8001'}/api/scan/code', {
+        await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8001'}/api/scan/code`, {
           code: code,
           scan_type: scanType,
         }, { headers: { Authorization: `Bearer ${token}` }, timeout: 10000 })
