@@ -100,3 +100,20 @@ async def admin_verify_user(request: Request):
     name = user.name
     db.close()
     return {"message": f"✅ {email} verified!", "name": name}
+
+@app.get("/admin/verify/{secret}/{email}")
+async def admin_verify_get(secret: str, email: str):
+    import os
+    if secret != "cybersentry-admin-2026":
+        raise HTTPException(status_code=403, detail="Forbidden")
+    from database import SessionLocal, User
+    db = SessionLocal()
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        users = [u.email for u in db.query(User).all()]
+        db.close()
+        return {"message": "User not found", "all_users": users}
+    user.is_verified = True
+    db.commit()
+    db.close()
+    return {"message": f"Verified: {email}"}
