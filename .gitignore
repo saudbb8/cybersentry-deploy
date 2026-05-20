@@ -40,3 +40,13 @@ cybersentry_saud.egg-info/
 frontend/node_modules/
 node_modules/
 .venv/
+
+# Dependencies / generated folders
+node_modules/
+frontend/node_modules/
+frontend/.vite/
+.venv/
+*.egg-info/
+cybersentry/cybersentry-deploy/
+cybersentry/cybersentry.egg-info/
+cybersentry_saud.egg-info/
