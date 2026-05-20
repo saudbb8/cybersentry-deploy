@@ -152,7 +152,7 @@ class IPReputationEngine:
 
     def _fetch_tor_exits(self) -> set[str]:
         try:
-            with urllib.request.urlopen(TOR_EXIT_URL, timeout=10) as r:
+            with urllib.request.urlopen(TOR_EXIT_URL, timeout=10) as r:  # nosec B310
                 data = r.read().decode("utf-8", errors="replace")
             result = set()
             for line in data.splitlines():

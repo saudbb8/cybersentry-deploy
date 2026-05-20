@@ -59,7 +59,7 @@ class Settings(BaseSettings):
     report_schedule_days: int = 7
 
     # API (for middleware communication)
-    api_host: str = "0.0.0.0"
+    api_host: str = "0.0.0.0"  # nosec B104
     api_port: int = 8765
 
     # Logging
