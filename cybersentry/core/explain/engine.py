@@ -650,7 +650,7 @@ _EXPLANATIONS.update({
         ),
         "how_exploited": (
             "An attacker sends username[$ne]=invalid&password[$ne]=invalid as POST body. "
-            "MongoDB interprets this as: find users where username != 'invalid' AND password != 'invalid' "
+            "MongoDB interprets this as: find users where username != 'invalid' AND password != 'invalid' "  # pragma: allowlist secret
             "which returns all users — bypassing authentication entirely."
         ),
         "business_impact": (
