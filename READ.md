@@ -14,7 +14,7 @@ Attack → Detect → Explain → Fix
 
 ```bash
 # Install
-git clone https://github.com/yourorg/cybersentry
+git clone https://github.com/saudbb8@gmail.com/cybersentry
 cd cybersentry
 pip install -e .
 
