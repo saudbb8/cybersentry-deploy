@@ -32,3 +32,11 @@ yarn-debug.log*
 yarn-error.log*
 frontend/node_modules/
 node_modules/
+
+# Generated folders
+cybersentry/cybersentry-deploy/
+cybersentry/cybersentry.egg-info/
+cybersentry_saud.egg-info/
+frontend/node_modules/
+node_modules/
+.venv/
