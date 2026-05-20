@@ -40,3 +40,18 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import httpx; httpx.get('http://localhost:8765/health')" || exit 1
 
 CMD ["cybersentry", "serve", "--host", "0.0.0.0", "--port", "8765"]
+
+WORKDIR /app
+
+COPY api/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY api/main.py ./main.py
+COPY api/database.py ./database.py
+COPY api/auth_utils.py ./auth_utils.py
+COPY api/email_service.py ./email_service.py
+COPY api/routers ./routers
+
+EXPOSE 8080
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

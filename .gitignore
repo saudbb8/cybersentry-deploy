@@ -1,23 +1,32 @@
 # Python
 .venv/
+venv/
 __pycache__/
 *.pyc
-*.egg-info/
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.coverage
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Node / frontend
+node_modules/
+frontend/node_modules/
 dist/
 build/
-.pytest_cache/
+frontend/dist/
+frontend/build/
 
-# CyberSentry data
-.cybersentry/
-
-# Secrets — never commit these
-.env
-.env.local
-.env.production
-*.key
-*.pem
-
-# macOS
+# System
 .DS_Store
-.venv/
-cybersentry/cybersentry-deploy/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
