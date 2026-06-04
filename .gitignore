@@ -1,22 +1,52 @@
-# Secrets
-api/.env
-*.env
-
-# Database
-*.db
-*.sqlite
-
-# Python cache
+# Python
+.venv/
+venv/
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.coverage
 
-# Node
+# Environment
+.env
+.env.*
+!.env.example
+
+# Node / frontend
+node_modules/
 frontend/node_modules/
+dist/
+build/
 frontend/dist/
+frontend/build/
 
-# Mac
+# System
 .DS_Store
 
-# venv
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+frontend/node_modules/
+node_modules/
+
+# Generated folders
+cybersentry/cybersentry-deploy/
+cybersentry/cybersentry.egg-info/
+cybersentry_saud.egg-info/
+frontend/node_modules/
+node_modules/
 .venv/
+
+# Dependencies / generated folders
+node_modules/
+frontend/node_modules/
+frontend/.vite/
+.venv/
+*.egg-info/
+cybersentry/cybersentry-deploy/
+cybersentry/cybersentry.egg-info/
+cybersentry_saud.egg-info/

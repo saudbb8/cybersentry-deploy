@@ -1,0 +1,51 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: debug-statements
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: detect-private-key
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: "CyberSentry — detect secrets"
+        args: ['--baseline', '.secrets.baseline']
+        exclude: |
+          (?x)^(
+            .*test.*|
+            \.secrets\.baseline|
+            \.venv/.*
+          )$
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.9.4
+    hooks:
+      - id: bandit
+        name: "CyberSentry — SAST scan"
+        args: ['-ll', '--skip', 'B101,B601', '--exclude', '.venv,tests']
+        exclude: '(\.venv/|tests/)'
+
+  - repo: local
+    hooks:
+      - id: cybersentry-secrets
+        name: "CyberSentry — secrets scan"
+        entry: cybersentry scan --type secrets --quiet
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: cybersentry-score
+        name: "CyberSentry — security score"
+        entry: cybersentry score
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]

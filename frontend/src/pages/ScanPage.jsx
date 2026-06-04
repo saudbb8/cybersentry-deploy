@@ -9,13 +9,13 @@ const SEV_B = { critical:'bg-red-950 border-red-900', high:'bg-orange-950 border
 const SCAN_TYPES = {
   full: {
     label: 'Full Scan',
-    desc: 'Checks everything — SQLi, XSS, CMDi, Path, SSRF, secrets, hardcoded passwords',
+    desc: 'Checks everything — SQLi, XSS, CMDi, Path, SSRF, exposed credentials, unsafe config',
     icon: '🔍',
     patterns: ['sqli','xss','path','cmdi','ssrf','ssti','secrets'],
   },
   secrets: {
     label: 'Secrets Only',
-    desc: 'Finds hardcoded passwords, API keys, tokens, connection strings',
+    desc: 'Finds exposed credentials, unsafe auth values, and connection strings',
     icon: '🔑',
     patterns: ['secrets'],
   },
@@ -57,7 +57,7 @@ const EXAMPLES = {
   '🔥 XSS':    `# XSS vulnerability\ndef render_page(user_input):\n    return f"<h1>Hello {user_input}</h1>"`,
   '📂 Path':   `# Path traversal\ndef read_file(filename):\n    return open("uploads/" + filename).read()`,
   '⚡ CMDi':   `# Command injection\ndef ping(host):\n    import os\n    os.system("ping -c 1 " + host)`,
-  '🔑 Secret': `# Hardcoded secrets\nDB_PASSWORD = "supersecret123"\nAPI_KEY = "sk-abc123def456ghi789"\nDEBUG = True`,
+  '🔑 Secret': `# Hardcoded secrets\nDB_PASSWORD = ""\nAPI_KEY = ""\nDEBUG = True`,
 }
 
 function scoreFromFindings(findings) {
@@ -136,7 +136,7 @@ export default function ScanPage() {
     setFindings(results)
     const scoreResult = scoreFromFindings(results)
     setScoreData(scoreResult)
-    
+
     // Save to SaaS API so Reports page shows it
     const token = localStorage.getItem('cs_token')
     if (token) {
