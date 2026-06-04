@@ -13,8 +13,8 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import Optional
 
-from database import get_db, User, Scan
-from auth_utils import get_current_user
+from database import get_db, User, Scan # type: ignore
+from auth_utils import get_current_user # type: ignore
 
 router = APIRouter()
 
