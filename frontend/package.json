@@ -23,13 +23,8 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-<<<<<<< HEAD
   "description": "CyberSentry SaaS Platform",
   "engines": {
-    "node": ">=18.0.0"
+    "node": "18.x"
   }
 }
-=======
-  "description": "CyberSentry SaaS Platform"
-}
->>>>>>> cbc8f053d11231f028a2b44a94776b15937fef71
