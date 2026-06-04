@@ -38,7 +38,9 @@ def _gmail(to, subject, html, text):
         msg["To"] = to
         msg.attach(MIMEText(text, "plain", "utf-8"))
         msg.attach(MIMEText(html, "html", "utf-8"))
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as s:
+        with smtplib.SMTP("smtp.gmail.com", 587) as s:
+            s.ehlo()
+            s.starttls()
             s.login(GMAIL_USER, GMAIL_PASSWORD)
             s.sendmail(FROM_EMAIL, to, msg.as_string())
         print(f"✅ Gmail sent → {to}")
