@@ -20,6 +20,8 @@ def generate_token(): return secrets.token_urlsafe(32)
 def hash_token(token): return hashlib.sha256(token.encode()).hexdigest()
 
 def send_email(to, subject, html, text):
+    if EMAIL_MODE == "sendgrid" and os.environ.get("SENDGRID_API_KEY"):
+        return _sendgrid(to, subject, html, text)
     if EMAIL_MODE == "gmail" and GMAIL_USER and len(GMAIL_PASSWORD) > 10:
         return _gmail(to, subject, html, text)
     return _terminal(to, subject, html, text)
@@ -95,3 +97,32 @@ def send_welcome_email(to, name):
 </div></div></div></body></html>"""
     text = f"Welcome to CyberSentry, {name}! Go to {APP_URL}/app"
     return send_email(to, f"Welcome to CyberSentry!", html, text)
+
+
+def _sendgrid(to, subject, html, text):
+    try:
+        import urllib.request, json
+        data = json.dumps({
+            "personalizations": [{"to": [{"email": to}]}],
+            "from": {"email": FROM_EMAIL or "noreply@cybersentry.app", "name": "CyberSentry"},
+            "subject": subject,
+            "content": [
+                {"type": "text/plain", "value": text},
+                {"type": "text/html",  "value": html},
+            ],
+        }).encode()
+        req = urllib.request.Request(
+            "https://api.sendgrid.com/v3/mail/send",
+            data=data,
+            headers={
+                "Authorization": f"Bearer {os.environ.get('SENDGRID_API_KEY','')}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=10) as r:
+            print(f"✅ SendGrid sent → {to} [{r.status}]")
+        return True
+    except Exception as e:
+        print(f"❌ SendGrid error: {e}")
+        return _terminal(to, subject, html, text)
