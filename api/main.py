@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 import time
 
 from database import init_db
-from routers import auth, scan, dashboard, users, otp, firewall
+from routers import auth, scan, dashboard, users, otp, firewall, admin
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -36,6 +36,7 @@ app.add_middleware(
 app.include_router(auth.router,      prefix="/api/auth",      tags=["Auth"])
 app.include_router(users.router,     prefix="/api/users",     tags=["Users"])
 app.include_router(scan.router,      prefix="/api/scan",      tags=["Scan"])
+app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
 app.include_router(firewall.router, prefix="/api/firewall", tags=["Firewall"])
 app.include_router(otp.router,      prefix="/api/otp",       tags=["OTP"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["Dashboard"])

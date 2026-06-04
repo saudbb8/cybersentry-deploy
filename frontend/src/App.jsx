@@ -12,6 +12,7 @@ import ReportsPage from './pages/ReportsPage.jsx'
 import SettingsPage from './pages/SettingsPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx'
 import FirewallPage from './pages/FirewallPage.jsx'
+import AdminPage from './pages/AdminPage.jsx'
 
 const nav = [
   { to:'/app',          icon:LayoutDashboard, label:'Dashboard', end:true },
@@ -95,7 +96,8 @@ export default function App() {
       <Route path="/reset-password"  element={<ResetPasswordPage/>}/>
       <Route path="/verify-email"    element={<VerifyEmailPage/>}/>
       <Route path="/app/*"           element={<Protected><AppLayout/></Protected>}/>
-      <Route path="*"                element={<Navigate to="/"/>}/>
+      <Route path="/admin" element={<AdminPage/>}/>
+      <Route path="*" element={<Navigate to="/"/>}/>
     </Routes>
   )
 }
