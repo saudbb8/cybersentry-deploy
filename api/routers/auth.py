@@ -71,7 +71,8 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
                 password_hash=hash_password(req.password), plan="free", is_verified=False)
     db.add(user); db.commit(); db.refresh(user)
     token = make_token(db, user.id, "verify_email", 24)
-    send_verification_email(user.email, user.name, token)
+    import threading
+    threading.Thread(target=send_verification_email, args=(user.email, user.name, token), daemon=True).start()
     print(f"✅ Registered: {user.email}")
     return {"message": "Account created! Check your email to verify.", "user": user_response(user), "needs_verification": True}
 
@@ -119,7 +120,8 @@ def resend(req: ResendRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email==req.email.lower().strip()).first()
     if user and not user.is_verified:
         token = make_token(db, user.id, "verify_email", 24)
-        send_verification_email(user.email, user.name, token)
+        import threading
+    threading.Thread(target=send_verification_email, args=(user.email, user.name, token), daemon=True).start()
         print(f"📧 Resent verification: {user.email}")
     return {"message": "If registered and unverified, a new link has been sent."}
 
@@ -128,7 +130,8 @@ def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email==req.email.lower().strip()).first()
     if user and user.is_active:
         token = make_token(db, user.id, "reset_password", 1)
-        send_password_reset_email(user.email, user.name, token)
+        import threading
+    threading.Thread(target=send_password_reset_email, args=(user.email, user.name, token), daemon=True).start()
         print(f"📧 Reset sent: {user.email}")
     return {"message": "If registered, a password reset link has been sent."}
 
