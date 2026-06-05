@@ -121,8 +121,8 @@ def resend(req: ResendRequest, db: Session = Depends(get_db)):
     if user and not user.is_verified:
         token = make_token(db, user.id, "verify_email", 24)
         import threading
-    threading.Thread(target=send_verification_email, args=(user.email, user.name, token), daemon=True).start()
-        print(f"📧 Resent verification: {user.email}")
+        threading.Thread(target=send_verification_email, args=(user.email, user.name, token), daemon=True).start()
+        print(f"Resent verification: {user.email}")
     return {"message": "If registered and unverified, a new link has been sent."}
 
 @router.post("/forgot-password")
