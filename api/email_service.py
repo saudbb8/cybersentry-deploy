@@ -19,12 +19,59 @@ print(f"EMAIL_SERVICE: mode={EMAIL_MODE} user={GMAIL_USER} pwd_len={len(GMAIL_PA
 def generate_token(): return secrets.token_urlsafe(32)
 def hash_token(token): return hashlib.sha256(token.encode()).hexdigest()
 
+def _resend(to, subject, html, text, api_key):
+    try:
+        import urllib.request as _ur, json as _j
+        data = _j.dumps({
+            "from": "CyberSentry <onboarding@resend.dev>",
+            "to": [to], "subject": subject,
+            "html": html, "text": text,
+        }).encode()
+        req = _ur.Request("https://api.resend.com/emails", data=data,
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            method="POST")
+        with _ur.urlopen(req, timeout=10) as r:
+            print(f"✅ Resend sent to {to}")
+        return True
+    except Exception as e:
+        print(f"❌ Resend error: {e}")
+        return _terminal(to, subject, html, text)
+
 def send_email(to, subject, html, text):
+    resend_key = os.environ.get("RESEND_API_KEY", "")
+    if resend_key:
+        return _resend(to, subject, html, text, resend_key)
+    resend_key = os.environ.get("RESEND_API_KEY", "")
+    if resend_key:
+        return _resend(to, subject, html, text, resend_key)
     if EMAIL_MODE == "sendgrid" and os.environ.get("SENDGRID_API_KEY"):
         return _sendgrid(to, subject, html, text)
     if EMAIL_MODE == "gmail" and GMAIL_USER and len(GMAIL_PASSWORD) > 10:
         return _gmail(to, subject, html, text)
     return _terminal(to, subject, html, text)
+
+def _resend(to, subject, html, text, api_key):
+    try:
+        import urllib.request as _ur, json as _j
+        data = _j.dumps({
+            "from": "CyberSentry <onboarding@resend.dev>",
+            "to": [to],
+            "subject": subject,
+            "html": html,
+            "text": text,
+        }).encode()
+        req = _ur.Request(
+            "https://api.resend.com/emails",
+            data=data,
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            method="POST",
+        )
+        with _ur.urlopen(req, timeout=10) as r:
+            print(f"✅ Resend sent → {to}")
+        return True
+    except Exception as e:
+        print(f"❌ Resend error: {e}")
+        return _terminal(to, subject, html, text)
 
 def _terminal(to, subject, html, text):
     print(f"\n{'='*60}\n📧 EMAIL — {subject}\nTO: {to}\n{'-'*60}\n{text}\n{'='*60}\n")
