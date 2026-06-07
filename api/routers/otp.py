@@ -75,8 +75,32 @@ def send_otp(req: SendOTPRequest, db: Session = Depends(get_db)):
   </div>
 </div></body></html>"""
         text = f"Hi {user.name},\n\nYour CyberSentry recovery code is: {otp}\n\nExpires in 10 minutes."
-        send_email(email, "Your CyberSentry recovery code", html, text)
-        print(f"📧 OTP sent to {email}: {otp}")
+        # Try Resend first (works on Railway), fallback to regular email
+        import os, urllib.request, json as _json
+        resend_key = os.environ.get("RESEND_API_KEY", "")
+        if resend_key:
+            try:
+                data = _json.dumps({
+                    "from": "CyberSentry <onboarding@resend.dev>",
+                    "to": [email],
+                    "subject": "Your CyberSentry recovery code",
+                    "html": html,
+                    "text": text,
+                }).encode()
+                req2 = urllib.request.Request(
+                    "https://api.resend.com/emails",
+                    data=data,
+                    headers={"Authorization": f"Bearer {resend_key}", "Content-Type": "application/json"},
+                    method="POST",
+                )
+                with urllib.request.urlopen(req2, timeout=10) as r:
+                    print(f"✅ Resend OTP sent to {email}")
+            except Exception as e:
+                print(f"❌ Resend failed: {e}")
+                send_email(email, "Your CyberSentry recovery code", html, text)
+        else:
+            send_email(email, "Your CyberSentry recovery code", html, text)
+        print(f"📧 OTP for {email}: {otp}")
 
     return {"message": "If this email is registered, an OTP has been sent.", "method": req.method}
 
