@@ -45,6 +45,7 @@ def send_otp(req: SendOTPRequest, db: Session = Depends(get_db)):
         return {"message": "If this email is registered, an OTP has been sent."}
 
     otp        = generate_otp()
+    print(f"📧 OTP CODE for {email}: {otp}")
     expires_at = datetime.now(timezone.utc) + timedelta(minutes=10)
 
     # Store OTP
