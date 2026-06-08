@@ -12,7 +12,7 @@ from datetime import datetime, timezone, timedelta
 
 from database import get_db, User, UserToken
 
-from email_service import generate_token, hash_token, send_email, APP_URL
+from email_service import generate_token, hash_token, send_email, send_otp_email, APP_URL
 
 router = APIRouter()
 
@@ -97,9 +97,9 @@ def send_otp(req: SendOTPRequest, db: Session = Depends(get_db)):
                     print(f"✅ Resend OTP sent to {email}")
             except Exception as e:
                 print(f"❌ Resend failed: {e}")
-                send_email(email, "Your CyberSentry recovery code", html, text)
+                send_otp_email(email, user.name, otp)
         else:
-            send_email(email, "Your CyberSentry recovery code", html, text)
+            send_otp_email(email, user.name, otp)
         print(f"📧 OTP for {email}: {otp}")
 
     return {"message": "If this email is registered, an OTP has been sent.", "method": req.method}
