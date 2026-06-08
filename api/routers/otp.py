@@ -102,6 +102,8 @@ def send_otp(req: SendOTPRequest, db: Session = Depends(get_db)):
             send_otp_email(email, user.name, otp)
         print(f"📧 OTP for {email}: {otp}")
 
+    # Always print OTP to logs
+    print(f"🔑 OTP for {email}: {otp}")
     return {"message": "If this email is registered, an OTP has been sent.", "method": req.method}
 
 
