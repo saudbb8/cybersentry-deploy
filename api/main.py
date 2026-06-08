@@ -118,3 +118,19 @@ async def admin_verify_get(secret: str, email: str):
     db.commit()
     db.close()
     return {"message": f"Verified: {email}"}
+
+@app.get("/test-email/{email}")
+async def test_email(email: str):
+    from email_service import send_email, GMAIL_USER, GMAIL_PASSWORD
+    result = send_email(
+        email,
+        "CyberSentry Test",
+        "<h1>Test email works!</h1>",
+        "Test email works!"
+    )
+    return {
+        "sent": result,
+        "gmail_user": GMAIL_USER,
+        "pwd_len": len(GMAIL_PASSWORD),
+        "to": email
+    }
