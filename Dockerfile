@@ -37,7 +37,7 @@ EXPOSE 8765
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import httpx; httpx.get('http://localhost:8765/health')" || exit 1
+    CMD python -c "import os,urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ.get('PORT','8080') + '/health',timeout=5)" || exit 1
 
 CMD ["cybersentry", "serve", "--host", "0.0.0.0", "--port", "8765"]
 
@@ -54,4 +54,7 @@ COPY api/routers ./routers
 
 EXPOSE 8080
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+COPY --chmod=0555 api/start.py /usr/local/bin/cybersentry-start.py
+ENV DB_PATH="/data/cybersentry.db"
+WORKDIR /app/api
+CMD ["python", "-I", "/usr/local/bin/cybersentry-start.py"]
