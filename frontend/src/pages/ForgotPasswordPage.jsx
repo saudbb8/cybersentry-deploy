@@ -223,13 +223,13 @@ function StepOTP({ email, method, onNext, onBack }) {
           <Mail size={28} style={{ color:'var(--accent)' }}/>
         </div>
         <p className="text-sm" style={{ color:'var(--text-secondary)' }}>
-          We sent a 6-digit code to
+          If this email belongs to an active account, check its inbox for a 6-digit recovery code:
         </p>
         <p className="font-bold mt-1" style={{ color:'var(--text-primary)' }}>{email}</p>
       </div>
 
       <ErrBox msg={err}/>
-      {resent && <SuccessBox msg="New code sent! Check your inbox."/>}
+      {resent && <SuccessBox msg="Recovery requested again. If an active account exists, check its inbox for a new code."/>}
 
       {/* OTP input boxes */}
       <div className="flex gap-3 justify-center mb-6" onPaste={handlePaste}>
@@ -261,7 +261,7 @@ function StepOTP({ email, method, onNext, onBack }) {
       <div className="text-center mb-6">
         {timeLeft > 0 ? (
           <p className="text-sm" style={{ color:'var(--text-muted)' }}>
-            Code expires in <span style={{ color:'var(--accent)', fontWeight:600 }}>{formatTime(timeLeft)}</span>
+            Time remaining to enter a code: <span style={{ color:'var(--accent)', fontWeight:600 }}>{formatTime(timeLeft)}</span>
           </p>
         ) : (
           <p className="text-sm" style={{ color:'#ef4444' }}>Code has expired. Please request a new one.</p>
@@ -292,6 +292,10 @@ function StepOTP({ email, method, onNext, onBack }) {
 
       <p className="text-xs text-center mt-4" style={{ color:'var(--text-muted)' }}>
         Check your spam folder if you don't see the email
+      </p>
+      <p className="text-sm text-center mt-4" style={{ color:'var(--text-secondary)' }}>
+        Haven't registered yet?{' '}
+        <Link to="/register" className="font-medium" style={{ color:'var(--accent)' }}>Create an account</Link>
       </p>
     </form>
   )
@@ -471,7 +475,7 @@ export default function ForgotPasswordPage() {
 
   const titles = [
     { title:'Forgot password?',   sub:'Recover access to your account'    },
-    { title:'Enter your code',    sub:'Check your email for the 6-digit code' },
+    { title:'Enter your code',    sub:'Recovery is available for existing accounts' },
     { title:'New password',       sub:'Choose a strong password'          },
     { title:'',                   sub:''                                  },
   ]
