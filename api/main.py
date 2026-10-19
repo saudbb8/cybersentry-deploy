@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 import time
+import os
 
 from database import init_db
 from routers import auth, scan, dashboard, users, otp, firewall, admin
@@ -26,8 +27,10 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=[origin.strip().rstrip("/") for origin in os.environ.get(
+        "CORS_ORIGINS", os.environ.get("APP_URL", "https://cybersentry-deploy.vercel.app")
+    ).split(",") if origin.strip()],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -62,75 +65,3 @@ def get_settings_public():
 async def save_settings_public():
     return {"ok": True, "message": "Settings saved"}
 
-import os
-from fastapi import Request
-
-@app.post("/admin/verify-user")
-async def admin_verify(request: Request):
-    data = await request.json()
-    if data.get("secret") != os.environ.get("ADMIN_SECRET", "cybersentry-admin-2026"):
-        raise HTTPException(403, "Forbidden")
-    email = data.get("email", "")
-    from database import SessionLocal, User
-    db = SessionLocal()
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        db.close()
-        return {"message": "User not found", "users": [u.email for u in db.query(User).all()]}
-    user.is_verified = True
-    db.commit()
-    db.close()
-    return {"message": f"Verified: {email}"}
-
-@app.post("/admin/verify-user")
-async def admin_verify_user(request: Request):
-    import os
-    data = await request.json()
-    if data.get("secret") != os.environ.get("ADMIN_SECRET", "cybersentry-admin-2026"):
-        raise HTTPException(status_code=403, detail="Forbidden")
-    email = data.get("email", "")
-    from database import SessionLocal, User
-    db = SessionLocal()
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        all_users = [u.email for u in db.query(User).all()]
-        db.close()
-        return {"message": "User not found", "all_users": all_users}
-    user.is_verified = True
-    db.commit()
-    name = user.name
-    db.close()
-    return {"message": f"✅ {email} verified!", "name": name}
-
-@app.get("/admin/verify/{secret}/{email}")
-async def admin_verify_get(secret: str, email: str):
-    import os
-    if secret != "cybersentry-admin-2026":
-        raise HTTPException(status_code=403, detail="Forbidden")
-    from database import SessionLocal, User
-    db = SessionLocal()
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        users = [u.email for u in db.query(User).all()]
-        db.close()
-        return {"message": "User not found", "all_users": users}
-    user.is_verified = True
-    db.commit()
-    db.close()
-    return {"message": f"Verified: {email}"}
-
-@app.get("/test-email/{email}")
-async def test_email(email: str):
-    from email_service import send_email, GMAIL_USER, GMAIL_PASSWORD
-    result = send_email(
-        email,
-        "CyberSentry Test",
-        "<h1>Test email works!</h1>",
-        "Test email works!"
-    )
-    return {
-        "sent": result,
-        "gmail_user": GMAIL_USER,
-        "pwd_len": len(GMAIL_PASSWORD),
-        "to": email
-    }

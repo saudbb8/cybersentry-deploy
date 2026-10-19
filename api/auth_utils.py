@@ -16,7 +16,9 @@ from sqlalchemy.orm import Session
 
 from database import get_db, User
 
-SECRET_KEY = os.environ.get("JWT_SECRET", "cybersentry-jwt-secret-change-in-production")
+SECRET_KEY = os.environ.get("JWT_SECRET", "")
+if not SECRET_KEY or SECRET_KEY == "cybersentry-jwt-secret-change-in-production":
+    raise RuntimeError("Set a private JWT_SECRET before starting the API")
 ALGORITHM  = "HS256"
 TOKEN_EXPIRE_HOURS = 24 * 7   # 7 days
 

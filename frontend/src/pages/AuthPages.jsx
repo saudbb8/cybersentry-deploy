@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Shield, Loader, Eye, EyeOff, AlertCircle, CheckCircle, Mail, ArrowLeft, Lock, RefreshCw } from 'lucide-react'
 import axios from 'axios'
 
-import { API } from '../config.js'
+import { API, apiError } from '../config.js'
 const BLOCKED = ['mailinator.com','guerrillamail.com','tempmail.com','yopmail.com','trashmail.com','10minutemail.com']
 
 function validateEmail(email) {
@@ -87,7 +87,7 @@ export function LoginPage() {
     } catch(ex){
       const detail = ex.response?.data?.detail||''
       if(detail==='EMAIL_NOT_VERIFIED') setNV(true)
-      else setErr(detail||'Login failed. Please try again.')
+      else setErr(apiError(ex, 'Login failed. Please try again.'))
     }
     setL(false)
   }
@@ -95,6 +95,7 @@ export function LoginPage() {
   if(notVerified) return (
     <Layout title="Verify your email first">
       <div className="text-center py-2">
+        <ErrBox msg={err}/>
         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{background:'rgba(245,158,11,0.1)'}}>
           <Mail size={28} style={{color:'#f59e0b'}}/>
         </div>
@@ -102,8 +103,11 @@ export function LoginPage() {
           Please verify <strong style={{color:'var(--text-primary)'}}>{email}</strong> before logging in.
         </p>
         <button onClick={async()=>{
-          await axios.post(`${API}/api/auth/resend-verification`,{email}).catch(()=>{})
-          alert('Verification email resent!')
+          setErr('')
+          try {
+            await axios.post(`${API}/api/auth/resend-verification`,{email})
+            alert('If this account needs verification, a new email has been sent.')
+          } catch (ex) { setErr(apiError(ex, 'The verification email could not be sent.')) }
         }} className="w-full py-3 rounded-xl text-sm font-medium mb-3 flex items-center justify-center gap-2"
           style={{background:'rgba(56,189,248,0.1)',color:'var(--accent)',border:'1px solid rgba(56,189,248,0.2)'}}>
           <Mail size={14}/>Resend verification email
@@ -143,6 +147,7 @@ export function RegisterPage() {
   const [errors,setE]  = useState({})
   const [err,setErr]   = useState('')
   const [done,setDone] = useState(false)
+  const [emailSent,setEmailSent] = useState(false)
   const strength = getStrength(f.password)
   const upd = (k,v)=>{ setF(p=>({...p,[k]:v})); setE(p=>({...p,[k]:null})); setErr('') }
 
@@ -161,10 +166,11 @@ export function RegisterPage() {
     if(Object.keys(errs).length>0) return
     setL(true)
     try {
-      await axios.post(`${API}/api/auth/register`,{name:f.name.trim(),email:f.email.toLowerCase().trim(),password:f.password})
+      const {data} = await axios.post(`${API}/api/auth/register`,{name:f.name.trim(),email:f.email.toLowerCase().trim(),password:f.password})
+      setEmailSent(data.verification_email_sent !== false)
       setDone(true)
     } catch(ex){
-      const msg=ex.response?.data?.detail||'Registration failed'
+      const msg=apiError(ex, 'Registration failed. Please try again.')
       if(msg.includes('already registered')) setE({email:msg})
       else setErr(msg)
     }
@@ -172,12 +178,14 @@ export function RegisterPage() {
   }
 
   if(done) return (
-    <Layout title="Check your email! 📬">
+    <Layout title={emailSent ? "Check your email! 📬" : "Account created"}>
       <div className="text-center py-2">
+        <ErrBox msg={err}/>
+        {!emailSent && <p className="text-sm mb-4" role="alert">Your account is saved. Please retry using Resend verification email below.</p>}
         <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4" style={{background:'rgba(56,189,248,0.1)'}}>
           <Mail size={40} style={{color:'var(--accent)'}}/>
         </div>
-        <p className="text-sm mb-2" style={{color:'var(--text-secondary)'}}>We sent a verification link to</p>
+        <p className="text-sm mb-2" style={{color:'var(--text-secondary)'}}>{emailSent ? 'We sent a verification link to' : 'We could not send the verification link to'}</p>
         <p className="font-bold mb-6" style={{color:'var(--text-primary)'}}>{f.email}</p>
         <div className="p-4 rounded-xl text-sm text-left mb-4 space-y-1" style={{background:'var(--bg-primary)',border:'1px solid var(--border)'}}>
           <p className="font-medium" style={{color:'var(--text-primary)'}}>Next steps:</p>
@@ -186,8 +194,12 @@ export function RegisterPage() {
           <p style={{color:'var(--text-secondary)'}}>3. You'll be logged in automatically</p>
         </div>
         <button onClick={async()=>{
-          await axios.post(`${API}/api/auth/resend-verification`,{email:f.email}).catch(()=>{})
-          alert('Resent! Check your inbox.')
+          setErr('')
+          try {
+            await axios.post(`${API}/api/auth/resend-verification`,{email:f.email})
+            setEmailSent(true)
+            alert('If this account needs verification, a new email has been sent.')
+          } catch (ex) { setErr(apiError(ex, 'The verification email could not be sent.')) }
         }} className="w-full py-3 rounded-xl text-sm font-medium mb-3 flex items-center justify-center gap-2"
           style={{background:'rgba(56,189,248,0.1)',color:'var(--accent)',border:'1px solid rgba(56,189,248,0.2)'}}>
           <RefreshCw size={14}/>Resend verification email
