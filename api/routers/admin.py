@@ -9,6 +9,7 @@ GET  /api/admin/logs         — activity logs
 POST /api/admin/login        — admin login
 """
 import os
+import hmac
 from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -20,8 +21,8 @@ from auth_utils import verify_password, create_token, get_current_user
 
 router = APIRouter()
 
-ADMIN_EMAIL    = os.environ.get("ADMIN_EMAIL", "saudbb8@gmail.com")
-ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "Admin@Cyber2026")
+ADMIN_EMAIL    = os.environ.get("ADMIN_EMAIL", "")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
 
 class AdminLoginRequest(BaseModel):
     email:    str
@@ -40,7 +41,9 @@ def require_admin(current_user: User = Depends(get_current_user)):
 
 @router.post("/login")
 def admin_login(req: AdminLoginRequest, db: Session = Depends(get_db)):
-    if req.email != ADMIN_EMAIL or req.password != ADMIN_PASSWORD:
+    if not ADMIN_EMAIL or not ADMIN_PASSWORD:
+        raise HTTPException(503, "Administrator login is not configured.")
+    if not hmac.compare_digest(req.email.encode(), ADMIN_EMAIL.encode()) or not hmac.compare_digest(req.password.encode(), ADMIN_PASSWORD.encode()):
         raise HTTPException(401, "Invalid admin credentials")
     
     # Get or create admin user

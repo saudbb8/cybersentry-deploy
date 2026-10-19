@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Shield, Mail, Phone, Loader, AlertCircle, CheckCircle, ArrowLeft, RefreshCw, Lock, Eye, EyeOff } from 'lucide-react'
 import axios from 'axios'
 
-import { API } from '../config.js'
+import { API, apiError } from '../config.js'
 
 function Layout({ title, subtitle, children, back }) {
   return (
@@ -63,13 +63,14 @@ function StepMethod({ onNext }) {
     if (!email.includes('@')) { setErr('Please enter a valid email'); return }
     setErr(''); setL(true)
     try {
-      await axios.post(`${API}/api/otp/send`, { email, method })
-      onNext({ email, method })
+      const normalizedEmail = email.trim().toLowerCase()
+      await axios.post(`${API}/api/otp/send`, { email: normalizedEmail, method })
+      onNext({ email: normalizedEmail, method })
     } catch (ex) {
-      // Always show success to prevent enumeration
-      onNext({ email, method })
+      setErr(apiError(ex, 'The recovery email could not be sent. Please try again.'))
+    } finally {
+      setL(false)
     }
-    setL(false)
   }
 
   return (
@@ -186,10 +187,16 @@ function StepOTP({ email, method, onNext, onBack }) {
 
   const resend = async () => {
     setResend(true)
-    await axios.post(`${API}/api/otp/send`, { email, method }).catch(() => {})
-    setResent(true); setTime(600)
-    setTimeout(() => setResent(false), 3000)
-    setResend(false)
+    setErr('')
+    try {
+      await axios.post(`${API}/api/otp/send`, { email, method })
+      setResent(true); setTime(600)
+      setTimeout(() => setResent(false), 3000)
+    } catch (ex) {
+      setErr(apiError(ex, 'The recovery email could not be sent. Please try again.'))
+    } finally {
+      setResend(false)
+    }
   }
 
   const submit = async e => {

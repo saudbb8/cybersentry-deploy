@@ -80,10 +80,12 @@ def register(req: RegisterRequest, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(user)
     token = make_token(db, user.id, "verify_email", 24)
-    threading.Thread(target=send_verification_email, args=(user.email, user.name, token), daemon=True).start()
+    email_sent = send_verification_email(user.email, user.name, token)
     print(f"Registered: {user.email}")
     return {
-        "message": "Account created! Check your email to verify.",
+        "message": ("Account created! Check your email to verify." if email_sent else
+                    "Account created, but the verification email could not be sent. Please retry sending it."),
+        "verification_email_sent": email_sent,
         "user": user_response(user),
         "needs_verification": True,
     }
@@ -136,7 +138,8 @@ def resend(req: ResendRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == req.email.lower().strip()).first()
     if user and not user.is_verified:
         token = make_token(db, user.id, "verify_email", 24)
-        threading.Thread(target=send_verification_email, args=(user.email, user.name, token), daemon=True).start()
+        if not send_verification_email(user.email, user.name, token):
+            raise HTTPException(503, "Verification email could not be sent. Please try again shortly.")
         print(f"Resent verification: {user.email}")
     return {"message": "If registered and unverified, a new link has been sent."}
 
@@ -145,7 +148,8 @@ def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == req.email.lower().strip()).first()
     if user and user.is_active:
         token = make_token(db, user.id, "reset_password", 1)
-        threading.Thread(target=send_password_reset_email, args=(user.email, user.name, token), daemon=True).start()
+        if not send_password_reset_email(user.email, user.name, token):
+            raise HTTPException(503, "Recovery email could not be sent. Please try again shortly.")
         print(f"Reset sent: {user.email}")
     return {"message": "If registered, a password reset link has been sent."}
 
