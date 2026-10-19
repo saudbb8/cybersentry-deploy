@@ -1,0 +1,21 @@
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+  VITE_API_URL = "/backend"
+
+# Keep browser requests on the preview's origin; the API remains on Railway.
+[[redirects]]
+  from = "/backend/*"
+  to = "https://cybersentry-deploy-production-2a7e.up.railway.app/:splat"
+  status = 200
+  force = true
+
+# React Router handles registration, recovery, and verification paths.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

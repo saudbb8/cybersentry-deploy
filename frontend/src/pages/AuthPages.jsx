@@ -187,12 +187,12 @@ export function RegisterPage() {
         </div>
         <p className="text-sm mb-2" style={{color:'var(--text-secondary)'}}>{emailSent ? 'We sent a verification link to' : 'We could not send the verification link to'}</p>
         <p className="font-bold mb-6" style={{color:'var(--text-primary)'}}>{f.email}</p>
-        <div className="p-4 rounded-xl text-sm text-left mb-4 space-y-1" style={{background:'var(--bg-primary)',border:'1px solid var(--border)'}}>
+        {emailSent && <div className="p-4 rounded-xl text-sm text-left mb-4 space-y-1" style={{background:'var(--bg-primary)',border:'1px solid var(--border)'}}>
           <p className="font-medium" style={{color:'var(--text-primary)'}}>Next steps:</p>
           <p style={{color:'var(--text-secondary)'}}>1. Open your email inbox</p>
           <p style={{color:'var(--text-secondary)'}}>2. Click "Verify my email"</p>
           <p style={{color:'var(--text-secondary)'}}>3. You'll be logged in automatically</p>
-        </div>
+        </div>}
         <button onClick={async()=>{
           setErr('')
           try {
