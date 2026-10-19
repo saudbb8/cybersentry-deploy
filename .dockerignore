@@ -1,0 +1,16 @@
+.git
+.env
+.env.*
+**/*.db
+**/*.db-*
+**/*.sqlite
+**/*.sqlite3
+**/__pycache__
+**/*.pyc
+**/node_modules
+frontend/dist
+.venv
+venv
+tests
+FIX_STATUS.json
+auth-recovery-fixes.patch
